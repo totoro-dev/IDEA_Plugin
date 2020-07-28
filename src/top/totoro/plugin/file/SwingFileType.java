@@ -9,10 +9,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 public class SwingFileType extends LanguageFileType {
+    private static final String TAG = SwingFileType.class.getSimpleName();
 
     public static final SwingFileType INSTANCE = new SwingFileType();
 
@@ -67,16 +69,18 @@ public class SwingFileType extends LanguageFileType {
     @Nullable
     @Override
     public String getCharset(@NotNull VirtualFile virtualFile, @NotNull byte[] bytes) {
-        System.out.println(virtualFile.getPath()+", "+virtualFile.getExtension());
-        if (Objects.equals(virtualFile.getExtension(), "xml")) {
+        if (Objects.equals(virtualFile.getExtension(), "xml") && virtualFile.getPath().contains("resources")) {
             if (SwingProjectInfo.getSwingProject(virtualFile.getPath()) == null) return "UTF-8";
             String data = new String(bytes, StandardCharsets.UTF_8);
             String[] ids = data.split("id *= *\"");
-            for (int i = 1; i < ids.length; i++) {
-                ids[i] = ids[i].substring(0, ids[i].indexOf("\""));
+            if (ids.length > 1) {
+                String[] finalIds = new String[ids.length - 1];
+                for (int i = 1; i < ids.length; i++) {
+                    finalIds[i - 1] = ids[i].substring(0, ids[i].indexOf("\""));
+                }
+                Log.d(TAG, "project : " + SwingProjectInfo.getSwingProject(virtualFile.getPath()).getProject().getBasePath());
+                SwingRFileCreator.createIdGroup(SwingProjectInfo.getSwingProject(virtualFile.getPath()).getProject().getBasePath(), finalIds);
             }
-            System.out.println("project : " + SwingProjectInfo.getSwingProject(virtualFile.getPath()).getProject().getBasePath());
-            SwingRFileCreator.createIdGroup(SwingProjectInfo.getSwingProject(virtualFile.getPath()).getProject().getBasePath(), null);
         }
         return "UTF-8";
     }
