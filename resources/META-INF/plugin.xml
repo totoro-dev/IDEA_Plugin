@@ -1,0 +1,26 @@
+<idea-plugin>
+    <id>com.your.company.unique.plugin.id</id>
+    <name>plugin_test</name>
+    <version>1.0</version>
+    <vendor email="649676485@qq.com" url="http://totoro-dev.top">龙猫</vendor>
+    <description>none description none description none description</description>
+    <change-notes>none change none change none change none change</change-notes>
+    <idea-version since-build="193.0"/>
+    <depends>com.intellij.modules.platform</depends>
+
+    <applicationListeners>
+        <listener class="top.totoro.plugin.file.SwingProjectOpenListener"
+                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
+        <listener class="top.totoro.plugin.file.SwingModuleListener"
+                  topic="com.intellij.openapi.project.ModuleListener"/>
+    </applicationListeners>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType name="Swing" implementationClass="top.totoro.plugin.file.SwingFileType"
+                  fieldName="INSTANCE" language="Swing" extensions="xml"/>
+    </extensions>
+
+    <actions>
+    </actions>
+
+</idea-plugin>
