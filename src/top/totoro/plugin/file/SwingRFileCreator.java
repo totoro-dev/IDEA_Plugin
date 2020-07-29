@@ -1,7 +1,13 @@
 package top.totoro.plugin.file;
 
 import java.io.*;
-import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class SwingRFileCreator {
     private static final String TAG = SwingRFileCreator.class.getSimpleName();
@@ -16,7 +22,9 @@ public class SwingRFileCreator {
     private static final String idClassStartRegex = "\tpublic static class id \\{\n";
     private static final String idFieldStart = "\t\tpublic static final int ";
 
-    public static void createIdGroup(String projectPath, String[] ids) {
+    private static final Map<File, Map<File, List<String>>> idInRFilesMap = new ConcurrentHashMap<>();
+
+    public static void createIdGroup(String projectPath, File res, String[] ids) {
         File RFile = new File(projectPath + RFilePath);
         try {
             // 确定R.java文件已生成
@@ -33,51 +41,51 @@ public class SwingRFileCreator {
             if (RFile.exists()) {
                 String contents = getRFileContent(RFile);
                 StringBuilder finalContents = new StringBuilder(contents);
+                Map<File, List<String>> idInFileMap = idInRFilesMap.computeIfAbsent(RFile, key -> new ConcurrentHashMap<>());
+                List<String> originFileIds = new ArrayList<>(Arrays.asList(ids));
+                idInFileMap.put(res, originFileIds.stream().distinct().collect(Collectors.toList()));
                 // 处理加入的id
                 String[] totals = contents.split(idClassStartRegex);
                 if (totals.length == 1) {
                     finalContents = new StringBuilder(totals[0].substring(0, totals[0].lastIndexOf("}")));
                     finalContents.append(idClassStart);
-                    for (int i = 0; i < ids.length; i++) {
-                        String id = ids[i];
-                        finalContents.append(idFieldStart).append(id).append("=0x").append(i).append(";\n");
-                    }
-                    finalContents.append("\t}\n}");
+                    AtomicInteger idIndex = new AtomicInteger();
+                    StringBuilder finalContents1 = finalContents;
+                    idInFileMap.forEach((file, idList) -> {
+                        for (String id : idList) {
+                            finalContents1.append(idFieldStart).append(id).append("=0x").append(Integer.toHexString(idIndex.get())).append(";\n");
+                            idIndex.getAndIncrement();
+                        }
+                    });
+                    finalContents1.append("\t}\n}");
+                    finalContents = finalContents1;
                 } else if (totals.length == 2) {
                     finalContents = new StringBuilder(totals[0]);
                     finalContents.append(idClassStart);
-                    String originIdsContent = totals[1].substring(0, totals[1].indexOf("}"));
-                    Log.d(TAG, "originIdsContent : \n" + originIdsContent);
-                    String[] originIds = originIdsContent.split(idFieldStart);
-                    // 将原有的id字段按照从小到大的顺序重新排序，防止后面id冲突
-                    for (int i = 0; i < originIds.length; i++) {
-                        Log.d(TAG, "originId = " + originIds[i]);
-                        if (originIds[i].indexOf("=0x") > 0) {
-                            String idName = originIds[i].substring(0, originIds[i].indexOf("=0x"));
-                            originIds[i] = idName + "=0x" + i + ";\n";
-                            finalContents.append(idFieldStart).append(originIds[i]);
+                    AtomicInteger idIndex = new AtomicInteger();
+                    StringBuilder finalContents1 = finalContents;
+                    idInFileMap.forEach((file, idList) -> {
+                        for (String id : idList) {
+//                            Log.d(TAG, "append id : " + id);
+                            finalContents1.append(idFieldStart).append(id).append("=0x").append(Integer.toHexString(idIndex.get())).append(";\n");
+                            idIndex.getAndIncrement();
                         }
-                    }
-                    // 需要把换行符去掉，否则正则表达式匹配失败
-                    originIdsContent = originIdsContent.replace("\n", "");
-                    for (int i = originIds.length, j = 0; j < ids.length; i++, j++) {
-                        String regex = ".*" + idFieldStart + ids[j] + "=0x.*";
-                        Log.d(TAG, "regex = " + regex);
-                        if (originIdsContent.matches(regex)) {
-                            // R.java中已经存在该id字段，不需要继续添加
-                            Log.d(TAG, "match id : " + ids[j]);
-                        } else {
-                            // 添加新的id字段
-                            finalContents.append(idFieldStart).append(ids[j]).append("=0x").append(j).append(";\n");
-                        }
-                    }
-                    finalContents.append("\t}\n}");
+                    });
+                    finalContents1.append("\t}\n}");
+                    finalContents = finalContents1;
                 }
                 setRFileContent(RFile, finalContents.toString());
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static boolean checkFileHasLoad(String projectPath, String filePath) {
+        File projectFile = new File(projectPath + RFilePath);
+        File file = new File(filePath);
+        return idInRFilesMap.get(projectFile) != null
+                && idInRFilesMap.get(projectFile).get(file) != null;
     }
 
     /**

@@ -1,0 +1,5 @@
+property ::= (KEY? SEPARATOR VALUE?) | KEY {
+  mixin="top.totoro.plugin.test.SimpleNamedElementImpl"
+  implements="top.totoro.plugin.test.SimpleNamedElement"
+  methods=[getKey getValue getName setName getNameIdentifier]
+}
