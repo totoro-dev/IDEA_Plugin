@@ -3,9 +3,10 @@ package top.totoro.plugin.test;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 
-public class SimplePsiImplUtil {
-    public static String getKey(SimpleProperty element) {
-        ASTNode keyNode = element.getNode().findChildByType(SimpleTypes.KEY);
+public class RIDPsiImplUtil {
+
+    public static String getKey(RIDProperty element) {
+        ASTNode keyNode = element.getNode().findChildByType(RIDTypes.KEY);
         if (keyNode != null) {
             // IMPORTANT: Convert embedded escaped spaces to simple spaces
             keyNode.getText().split("R\\.");
@@ -15,8 +16,8 @@ public class SimplePsiImplUtil {
         }
     }
 
-    public static String getValue(SimpleProperty element) {
-        ASTNode valueNode = element.getNode().findChildByType(SimpleTypes.VALUE);
+    public static String getValue(RIDProperty element) {
+        ASTNode valueNode = element.getNode().findChildByType(RIDTypes.VALUE);
         if (valueNode != null) {
             return valueNode.getText();
         } else {
@@ -24,22 +25,22 @@ public class SimplePsiImplUtil {
         }
     }
 
-    public static String getName(SimpleProperty element) {
+    public static String getName(RIDProperty element) {
         return getKey(element);
     }
 
-    public static PsiElement setName(SimpleProperty element, String newName) {
-        ASTNode keyNode = element.getNode().findChildByType(SimpleTypes.KEY);
+    public static PsiElement setName(RIDProperty element, String newName) {
+        ASTNode keyNode = element.getNode().findChildByType(RIDTypes.KEY);
         if (keyNode != null) {
-            SimpleProperty property = SimpleElementFactory.createProperty(element.getProject(), newName);
+            RIDProperty property = RIDElementFactory.createProperty(element.getProject(), newName);
             ASTNode newKeyNode = property.getFirstChild().getNode();
             element.getNode().replaceChild(keyNode, newKeyNode);
         }
         return element;
     }
 
-    public static PsiElement getNameIdentifier(SimpleProperty element) {
-        ASTNode keyNode = element.getNode().findChildByType(SimpleTypes.KEY);
+    public static PsiElement getNameIdentifier(RIDProperty element) {
+        ASTNode keyNode = element.getNode().findChildByType(RIDTypes.KEY);
         if (keyNode != null) {
             return keyNode.getPsi();
         } else {

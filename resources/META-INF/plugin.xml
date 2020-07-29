@@ -1,26 +1,68 @@
 <idea-plugin>
-    <id>com.your.company.unique.plugin.id</id>
-    <name>plugin_test</name>
-    <version>1.0</version>
-    <vendor email="649676485@qq.com" url="http://totoro-dev.top">龙猫</vendor>
-    <description>none description none description none description</description>
-    <change-notes>none change none change none change none change</change-notes>
-    <idea-version since-build="193.0"/>
-    <depends>com.intellij.modules.platform</depends>
+  <id>com.your.company.unique.plugin.id</id>
+  <name>Plugin display name here</name>
+  <version>1.0</version>
+  <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
 
-    <applicationListeners>
-        <listener class="top.totoro.plugin.file.SwingProjectOpenListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
-        <listener class="top.totoro.plugin.file.SwingModuleListener"
-                  topic="com.intellij.openapi.project.ModuleListener"/>
-    </applicationListeners>
+  <description><![CDATA[
+      Enter short description for your plugin here.<br>
+      <em>most HTML tags may be used</em>
+    ]]></description>
 
-    <extensions defaultExtensionNs="com.intellij">
-        <fileType name="Swing" implementationClass="top.totoro.plugin.file.SwingFileType"
-                  fieldName="INSTANCE" language="Swing" extensions="xml"/>
-    </extensions>
+  <change-notes><![CDATA[
+      Add change notes here.<br>
+      <em>most HTML tags may be used</em>
+    ]]>
+  </change-notes>
 
-    <actions>
-    </actions>
+  <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+  <idea-version since-build="193.0"/>
+
+  <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
+  <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.modules.java</depends>
+
+  <applicationListeners>
+    <listener class="top.totoro.plugin.file.SwingProjectOpenListener"
+              topic="com.intellij.openapi.project.ProjectManagerListener"/>
+    <!--        <listener class="top.totoro.plugin.file.SwingModuleListener"-->
+    <!--                  topic="com.intellij.openapi.project.ModuleListener"/>-->
+  </applicationListeners>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!--        <fileType name="Swing" implementationClass="top.totoro.plugin.file.SwingFileType"-->
+    <!--                  fieldName="INSTANCE" language="Swing" extensions="xml"/>-->
+    <fileType name="Swing File" implementationClass="top.totoro.plugin.test.SimpleFileType"
+              fieldName="INSTANCE" language="Simple" extensions="swing"/>
+    <lang.parserDefinition language="Simple"
+                           implementationClass="top.totoro.plugin.test.SimpleParserDefinition"/>
+    <lang.parserDefinition language="JAVA"
+                           implementationClass="top.totoro.plugin.test.RIDParserDefinition"/>
+    <lang.syntaxHighlighterFactory language="Simple"
+                                   implementationClass="top.totoro.plugin.test.SimpleSyntaxHighlighterFactory"/>
+    <colorSettingsPage implementation="top.totoro.plugin.test.SimpleColorSettingsPage"/>
+    <!--        <annotator language="JAVA" implementationClass="top.totoro.plugin.test.SimpleAnnotator"/>-->
+    <codeInsight.lineMarkerProvider language="Simple"
+                                    implementationClass="top.totoro.plugin.test.SimpleLineMarkerProvider"/>
+    <completion.contributor language="Simple"
+                            implementationClass="top.totoro.plugin.test.SimpleCompletionContributor"/>
+    <psi.referenceContributor implementation="top.totoro.plugin.test.SimpleReferenceContributor"/>
+    <lang.refactoringSupport language="Simple"
+                             implementationClass="top.totoro.plugin.test.SimpleRefactoringSupportProvider"/>
+    <lang.findUsagesProvider language="Simple"
+                             implementationClass="top.totoro.plugin.test.SimpleFindUsagesProvider"/>
+  </extensions>
+
+  <actions>
+    <group id="top.totoro.plugin.ActionTest1" class="top.totoro.plugin.action.SwingGroup" popup="true"
+           text="SwingPro" description="Custom defaultActionGroup demo">
+      <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
+<!--      <action id="top.totoro.plugin.ActionTest2" class="top.totoro.plugin.action.NewSwingFile" text="New Swing File"-->
+<!--              description="ActionTest2">-->
+<!--        <add-to-group group-id="ToolsMenu" anchor="first"/>-->
+<!--      </action>-->
+    </group>
+  </actions>
 
 </idea-plugin>

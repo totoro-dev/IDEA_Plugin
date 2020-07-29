@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.*;
+import top.totoro.plugin.file.Log;
 
 import java.util.*;
 
@@ -15,6 +16,7 @@ public class SimpleReference extends PsiReferenceBase<PsiElement> implements Psi
     public SimpleReference(@NotNull PsiElement element, TextRange textRange) {
         super(element, textRange);
         key = element.getText().substring(textRange.getStartOffset(), textRange.getEndOffset());
+        Log.d("", "value = " + key);
     }
 
     @NotNull
@@ -43,7 +45,7 @@ public class SimpleReference extends PsiReferenceBase<PsiElement> implements Psi
         List<SimpleProperty> properties = SimpleUtil.findProperties(project);
         List<LookupElement> variants = new ArrayList<>();
         for (final SimpleProperty property : properties) {
-            if (property.getKey() != null && property.getKey().length() > 0) {
+            if (property.getValue() != null && property.getValue().length() > 0) {
                 variants.add(LookupElementBuilder
                         .create(property).withIcon(SimpleIcons.FILE)
                         .withTypeText(property.getContainingFile().getName())

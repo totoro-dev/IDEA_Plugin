@@ -6,6 +6,10 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
+import top.totoro.plugin.file.Log;
+
+import static top.totoro.plugin.test.SimpleAnnotator.SIMPLE_PREFIX_STR;
+import static top.totoro.plugin.test.SimpleAnnotator.SIMPLE_SEPARATOR_STR;
 
 public class SimpleReferenceContributor extends PsiReferenceContributor {
     @Override
@@ -22,6 +26,7 @@ public class SimpleReferenceContributor extends PsiReferenceContributor {
                         if ((value != null && value.startsWith(SIMPLE_PREFIX_STR + SIMPLE_SEPARATOR_STR))) {
                             TextRange property = new TextRange(SIMPLE_PREFIX_STR.length() + SIMPLE_SEPARATOR_STR.length() + 1,
                                     value.length() + 1);
+                            Log.d("SimpleReferenceContributor","has a value : "+((PsiLiteralExpression) element).getValue());
                             return new PsiReference[]{new SimpleReference(element, property)};
                         }
                         return PsiReference.EMPTY_ARRAY;
