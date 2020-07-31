@@ -18,17 +18,20 @@ import com.intellij.psi.TokenType;
 
 CRLF=\R
 WHITE_SPACE=[\ \n\t\f]
-FIRST_VALUE_CHARACTER=[^ \n\f\\] | "\\"{CRLF} | "\\".
-VALUE_CHARACTER=[^\n\f\\] | "\\"{CRLF} | "\\".
+FIRST_VALUE_CHARACTER=[^= \n\f\\] | "\\"{CRLF} | "\\".
+VALUE_CHARACTER=[^\n\f\\>/] | "\\"{CRLF} | "\\".
 END_OF_LINE_COMMENT=("#"|"!")[^\r\n]*
-SEPARATOR=[:=]
+SEPARATOR=[=]
 KEY_CHARACTER=[^:=\ \n\t\f\\] | "\\ "
+TAG=[>] | "/">[\r\n\f] | " "*\t*<.*[\r\n\f>] | <\/
 
 %state WAITING_VALUE
 
 %%
 
 <YYINITIAL> {END_OF_LINE_COMMENT}                           { yybegin(YYINITIAL); return SimpleTypes.COMMENT; }
+
+<YYINITIAL> {TAG}                                           { yybegin(YYINITIAL); return SimpleTypes.TAG; }
 
 <YYINITIAL> {KEY_CHARACTER}+                                { yybegin(YYINITIAL); return SimpleTypes.KEY; }
 

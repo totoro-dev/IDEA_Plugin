@@ -31,7 +31,7 @@ class RIDLexer implements FlexLexer {
    *                  at the beginning of a line
    * l is of the form l = 2*k, k a non negative integer
    */
-  private static final int ZZ_LEXSTATE[] = { 
+  private static final int[] ZZ_LEXSTATE = {
      0,  0,  1, 1
   };
 
@@ -45,15 +45,15 @@ class RIDLexer implements FlexLexer {
   }
 
   /* The ZZ_CMAP_Z table has 272 entries */
-  static final char ZZ_CMAP_Z[] = zzUnpackCMap(
+  static final char[] ZZ_CMAP_Z = zzUnpackCMap(
     "\1\0\1\100\1\200\u010d\100");
 
   /* The ZZ_CMAP_Y table has 192 entries */
-  static final char ZZ_CMAP_Y[] = zzUnpackCMap(
+  static final char[] ZZ_CMAP_Y = zzUnpackCMap(
     "\1\0\1\1\1\2\175\3\1\4\77\3");
 
   /* The ZZ_CMAP_A table has 320 entries */
-  static final char ZZ_CMAP_A[] = zzUnpackCMap(
+  static final char[] ZZ_CMAP_A = zzUnpackCMap(
     "\11\0\1\4\1\2\1\1\1\5\1\3\22\0\1\7\1\10\1\0\1\10\12\0\1\13\43\0\1\14\11\0"+
     "\1\6\7\0\1\12\4\0\1\11\33\0\1\1\242\0\2\1\26\0");
 
@@ -193,7 +193,7 @@ class RIDLexer implements FlexLexer {
   }
 
   /** the input device */
-  private java.io.Reader zzReader;
+  private final java.io.Reader zzReader;
 
   /** the current state of the DFA */
   private int zzState;

@@ -17,7 +17,7 @@
 
 simpleFile ::= item_*
 
-private item_ ::= (property|COMMENT|CRLF)
+private item_ ::= (property|COMMENT|CRLF|TAG)
 
 property ::= (KEY? SEPARATOR VALUE?) | KEY {
   mixin="top.totoro.plugin.test.SimpleNamedElementImpl"

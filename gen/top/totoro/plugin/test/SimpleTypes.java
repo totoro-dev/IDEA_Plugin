@@ -14,6 +14,7 @@ public interface SimpleTypes {
   IElementType CRLF = new SimpleTokenType("CRLF");
   IElementType KEY = new SimpleTokenType("KEY");
   IElementType SEPARATOR = new SimpleTokenType("SEPARATOR");
+  IElementType TAG = new SimpleTokenType("TAG");
   IElementType VALUE = new SimpleTokenType("VALUE");
 
   class Factory {

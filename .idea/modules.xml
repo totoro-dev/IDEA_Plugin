@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/IDEA_Plugin.iml" filepath="$PROJECT_DIR$/IDEA_Plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SwingPro.iml" filepath="$PROJECT_DIR$/SwingPro.iml" />
     </modules>
   </component>
 </project>

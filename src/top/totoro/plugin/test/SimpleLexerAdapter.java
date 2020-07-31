@@ -8,6 +8,6 @@ import java.io.Reader;
 
 public class SimpleLexerAdapter extends FlexAdapter {
     public SimpleLexerAdapter() {
-        super(new SimpleLexer((Reader) null));
+        super(new SimpleLexer(null));
     }
 }

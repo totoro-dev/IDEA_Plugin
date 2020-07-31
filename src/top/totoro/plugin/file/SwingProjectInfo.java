@@ -1,14 +1,10 @@
 package top.totoro.plugin.file;
 
-import com.intellij.externalSystem.JavaProjectData;
 import com.intellij.openapi.project.Project;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static com.intellij.openapi.project.impl.ProjectImpl.CREATION_TIME;
-import static com.intellij.openapi.project.impl.ProjectImpl.CREATION_TRACE;
 
 public class SwingProjectInfo {
     private Project project;
@@ -19,8 +15,6 @@ public class SwingProjectInfo {
             SwingProjectInfo swingProjectInfo = new SwingProjectInfo();
             swingProjectInfo.project = project;
             projects.put(project.getBasePath(), swingProjectInfo);
-
-            System.out.println("setProject path = "+project.getUserData(CREATION_TIME));
         }
     }
 

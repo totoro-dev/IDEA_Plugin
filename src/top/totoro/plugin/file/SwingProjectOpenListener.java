@@ -9,7 +9,6 @@ public class SwingProjectOpenListener implements ProjectManagerListener {
 
     @Override
     public void projectOpened(@NotNull Project project) {
-        System.out.println("has module = "+project.getComponent("MavenProjectsManager"));
         SwingProjectInfo.setProject(project);
     }
 }

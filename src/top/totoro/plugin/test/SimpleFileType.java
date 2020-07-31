@@ -1,5 +1,4 @@
 package top.totoro.plugin.test;
-// Copyright 2000-2020 JetBrains s.r.o. and other contributors. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file.
 
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.intellij.openapi.project.Project;
@@ -12,6 +11,7 @@ import top.totoro.plugin.file.SwingResGroupCreator;
 
 import javax.swing.*;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
@@ -60,17 +60,24 @@ public class SimpleFileType extends LanguageFileType {
     @Override
     public Charset extractCharsetFromFileContent(@Nullable Project project, @Nullable VirtualFile virtualFile, @NotNull CharSequence content) {
         Log.d(TAG, "extractCharsetFromFileContent()");
-        if (virtualFile == null) return super.extractCharsetFromFileContent(project, null, content);
+        if (project == null || virtualFile == null) return super.extractCharsetFromFileContent(project, null, content);
         if (Objects.equals(virtualFile.getExtension(), getDefaultExtension()) && virtualFile.getPath().contains("src/main/resources")) {
-            if (SwingProjectInfo.getSwingProject(virtualFile.getPath()) == null)
-                return super.extractCharsetFromFileContent(project, virtualFile, content);
             String swingFilePath = virtualFile.getPath();
             Log.d(TAG, "swingFilePath : " + swingFilePath);
             if (swingFilePath.lastIndexOf("src/main") > 0) {
+                // 当前处理的资源文件可能是主项目的，也可能是子模块的，需要做定位，决定了R.java文件的准确性
                 String modulePath = swingFilePath.substring(0, swingFilePath.lastIndexOf("src/main"));
                 Log.d(TAG, "project : " + modulePath);
+                // 开始创建或更新资源组，同步修改到R.java中
                 SwingResGroupCreator.createResGroup(modulePath, new File(swingFilePath), content.toString());
-                virtualFile.refresh(false, true);
+                // 刷新项目，确保修改能第一时间被感应
+//                try {
+//                    SwingUtilities.invokeAndWait(()->{
+//                        project.getBaseDir().refresh(false, true);
+//                    });
+//                } catch (InterruptedException | InvocationTargetException e) {
+//                    e.printStackTrace();
+//                }
             }
         }
         return super.extractCharsetFromFileContent(project, virtualFile, content);

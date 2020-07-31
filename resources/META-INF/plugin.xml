@@ -55,10 +55,10 @@
   </extensions>
 
   <actions>
-    <group id="top.totoro.plugin.ActionTest1" class="top.totoro.plugin.action.SwingGroup" popup="true"
+    <group id="top.totoro.plugin.ActionTest1" class="top.totoro.plugin.action.SwingProGroup" popup="true"
            text="SwingPro" description="Custom defaultActionGroup demo">
       <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
-<!--      <action id="top.totoro.plugin.ActionTest2" class="top.totoro.plugin.action.NewSwingFile" text="New Swing File"-->
+<!--      <action id="top.totoro.plugin.ActionTest2" class="top.totoro.plugin.action.NewSwingFileAction" text="New Swing File"-->
 <!--              description="ActionTest2">-->
 <!--        <add-to-group group-id="ToolsMenu" anchor="first"/>-->
 <!--      </action>-->

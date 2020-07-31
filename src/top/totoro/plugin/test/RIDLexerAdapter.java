@@ -6,6 +6,6 @@ import java.io.Reader;
 
 public class RIDLexerAdapter  extends FlexAdapter {
     public RIDLexerAdapter() {
-        super(new RIDLexer((Reader) null));
+        super(new RIDLexer(null));
     }
 }
