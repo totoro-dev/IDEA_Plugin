@@ -17,15 +17,11 @@ import top.totoro.plugin.file.Log;
 import top.totoro.plugin.file.SwingResGroupCreator;
 import top.totoro.plugin.ui.NewSwingModuleWrapper;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import static top.totoro.plugin.constant.Constants.DEFAULT_MAIN_ACTIVITY_CONTENT;
-import static top.totoro.plugin.constant.Constants.DEFAULT_SWING_FILE_CONTENT;
+import static top.totoro.plugin.constant.Constants.*;
 
 public class NewSwingModuleAction extends NewModuleAction {
 
@@ -51,6 +47,7 @@ public class NewSwingModuleAction extends NewModuleAction {
             defaultPath = virtualFile.getPath();
         }
         NewSwingModuleWrapper wizard = new NewSwingModuleWrapper(project, new DefaultModulesProvider(project), defaultPath);
+        wizard.setRootFile(virtualFile);
 
         Log.d(TAG, "actionPerformed start");
         if (wizard.showAndGet()) {
@@ -70,8 +67,8 @@ public class NewSwingModuleAction extends NewModuleAction {
             module = ((ModuleBuilder) builder).commitModule(project, null);
             if (module != null) {
                 processCreatedModule(module, dataFromContext);
+                createSwingProjectFiles(module);
             }
-            createSwingProjectFiles(module);
             return module;
         } else {
             Log.d(TAG, "createModuleFromWizard start not as ModuleBuilder");
@@ -85,6 +82,7 @@ public class NewSwingModuleAction extends NewModuleAction {
         return module;
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void createSwingProjectFiles(Module module) {
         String modulePath = module.getModuleFilePath().substring(0, module.getModuleFilePath().lastIndexOf("/"));
         /************** 生成资源文件 *****************/
@@ -107,6 +105,7 @@ public class NewSwingModuleAction extends NewModuleAction {
             OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(main_activity), StandardCharsets.UTF_8);
             osw.write(DEFAULT_SWING_FILE_CONTENT);
             osw.flush();
+            osw.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -124,10 +123,29 @@ public class NewSwingModuleAction extends NewModuleAction {
             OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(MainActivity), StandardCharsets.UTF_8);
             osw.write(DEFAULT_MAIN_ACTIVITY_CONTENT);
             osw.flush();
+            osw.close();
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
         SwingResGroupCreator.createResGroup(modulePath, main_activity, DEFAULT_SWING_FILE_CONTENT);
+        /************** 添加SwingPro的依赖 *****************/
+        File pomFile = new File(modulePath + "/pom.xml");
+        String pomContent = "";
+        StringBuilder content = new StringBuilder();
+        try (FileReader fr = new FileReader(pomFile); BufferedReader br = new BufferedReader(fr)) {
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+            content.insert(content.lastIndexOf("</project>"),DEPENDENCY);
+            pomContent = content.toString();
+            OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(pomFile), StandardCharsets.UTF_8);
+            osw.write(pomContent);
+            osw.flush();
+            osw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         // 刷新目录
         virtualFile.refresh(false, true);
     }

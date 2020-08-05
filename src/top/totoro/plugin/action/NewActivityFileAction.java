@@ -7,6 +7,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
+import top.totoro.plugin.file.Log;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,16 +16,16 @@ import java.awt.event.KeyListener;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-import static top.totoro.plugin.constant.Constants.*;
+import static top.totoro.plugin.constant.Constants.NEW_SWING_FILE_CONTENT;
 
-public class NewSwingFileAction extends AnAction {
+public class NewActivityFileAction extends AnAction {
 
     private Project project;
     private String path;
     private VirtualFile chooseFile;
 
-    public NewSwingFileAction() {
-        super("新建Swing布局");
+    public NewActivityFileAction() {
+        super("新建Activity文件");
     }
 
     public void setChooseFile(VirtualFile chooseFile) {
@@ -34,7 +35,7 @@ public class NewSwingFileAction extends AnAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
         project = anActionEvent.getProject();
-        new NewSwingFileDialog().show();
+        new NewActivityFileDialog().show();
     }
 
     @Override
@@ -42,8 +43,8 @@ public class NewSwingFileAction extends AnAction {
         super.update(e);
         e.getPresentation().setEnabled(false);
         /* 处理新建Swing布局按钮是否可用 */
-        if (chooseFile.getPath().contains("resources")) {
-            if (chooseFile.getName().equals("resources") || chooseFile.getName().equals("layout")) {
+        if (chooseFile.getPath().contains("/java")) {
+            if (chooseFile.getName().equals("java") || chooseFile.getPath().contains("/java/")) {
                 e.getPresentation().setEnabled(true);
             }
         }
@@ -53,13 +54,12 @@ public class NewSwingFileAction extends AnAction {
         this.path = path;
     }
 
-
     /* 点击新建Swing布局的对话框 */
-    public class NewSwingFileDialog extends DialogWrapper {
+    public class NewActivityFileDialog extends DialogWrapper {
 
-        public NewSwingFileDialog() {
+        public NewActivityFileDialog() {
             super(true);
-            setTitle("新建Swing布局文件"); //设置会话框标题
+            setTitle("新建Activity文件"); //设置会话框标题
             setResizable(false);
             init(); //触发一下init方法，否则swing样式将无法展示在会话框
         }
@@ -94,14 +94,14 @@ public class NewSwingFileAction extends AnAction {
 
             //按钮事件绑定
             submit.addActionListener(e -> {
-                createSwingFile();
+                createActivityFile();
             });
 
             nameContent.addKeyListener(new KeyListener() {
                 @Override
                 public void keyTyped(KeyEvent e) {
                     if (e.getKeyChar() == KeyEvent.VK_ENTER)
-                        createSwingFile();
+                        createActivityFile();
                 }
 
                 @Override
@@ -119,25 +119,30 @@ public class NewSwingFileAction extends AnAction {
         }
 
         @SuppressWarnings({"DialogTitleCapitalization", "ResultOfMethodCallIgnored"})
-        private void createSwingFile() {
-            if (nameContent.getText() == null || nameContent.getText().isEmpty()){
+        private void createActivityFile() {
+            if (nameContent.getText() == null || nameContent.getText().isEmpty()) {
                 Messages.showMessageDialog(project, "文件名不能为空", "无法创建", Messages.getErrorIcon());
                 return;
             }
-            String filename = nameContent.getText() + ".swing";
-            File swingFile = new File(path.endsWith("layout") ? path + "/" + filename : path + "/layout/" + filename);
-            if (swingFile.exists()) {
+            String filename = nameContent.getText() + ".java";
+            String packagePath = "";
+            if (!path.endsWith("/java")) {
+                packagePath = path.substring(path.indexOf("/java/") + "/java/".length());
+                Log.d(this, "packagePath = " + packagePath);
+            }
+            File activityFile = new File(path + "/" + filename);
+            if (activityFile.exists()) {
                 Messages.showMessageDialog(project, filename + "已存在", "无法创建", Messages.getErrorIcon());
                 return;
             }
-            if (!swingFile.getParentFile().exists()) {
-                swingFile.getParentFile().mkdirs();
+            if (!activityFile.getParentFile().exists()) {
+                activityFile.getParentFile().mkdirs();
             }
-            if (swingFile.getParentFile().exists()) {
+            if (activityFile.getParentFile().exists()) {
                 try {
-                    swingFile.createNewFile();
-                    OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(swingFile), StandardCharsets.UTF_8);
-                    osw.write(NEW_SWING_FILE_CONTENT);
+                    activityFile.createNewFile();
+                    OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(activityFile), StandardCharsets.UTF_8);
+                    osw.write(getActivityContent(packagePath, nameContent.getText()));
                     osw.flush();
                     osw.close();
                     // 刷新目录
@@ -165,6 +170,23 @@ public class NewSwingFileAction extends AnAction {
             //定义表单的主题，放置到IDEA会话框的中央位置
             return initCenter();
         }
+    }
+
+    private String getActivityContent(String packagePath, String className) {
+        String packageHeader = "";
+        if (!packagePath.isEmpty()) {
+            packageHeader = "package " + packagePath + ";\n\n";
+        }
+        String importContent = "import swing.R;\n" +
+                "import top.totoro.swing.widget.context.Activity;\n\n";
+        String classHeader = "public class " + className + " extends Activity {\n";
+        String classBody = "    @Override\n" +
+                "    public void onCreate() {\n" +
+                "        super.onCreate();\n" +
+                "        setContentView(R.layout.activity_main);\n" +
+                "    }\n";
+        String classTail = "}\n";
+        return packageHeader + importContent + classHeader + classBody + classTail;
     }
 
 }

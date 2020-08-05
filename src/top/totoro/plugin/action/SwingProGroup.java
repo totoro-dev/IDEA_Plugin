@@ -13,11 +13,13 @@ public class SwingProGroup extends DefaultActionGroup {
     private static final String TAG = SwingProGroup.class.getSimpleName();
     private static final NewSwingProjectAction NEW_SWING_PROJECT_ACTION = new NewSwingProjectAction();
     private static final NewSwingModuleAction NEW_SWING_MODULE_ACTION = new NewSwingModuleAction();
+    private static final NewActivityFileAction NEW_ACTIVITY_FILE_ACTION = new NewActivityFileAction();
     private static final NewSwingFileAction NEW_SWING_FILE_ACTION = new NewSwingFileAction();
 
     public SwingProGroup() {
         add(NEW_SWING_PROJECT_ACTION);
-        add(NEW_SWING_MODULE_ACTION);
+//        add(NEW_SWING_MODULE_ACTION);
+        add(NEW_ACTIVITY_FILE_ACTION);
         add(NEW_SWING_FILE_ACTION);
     }
 
@@ -37,6 +39,8 @@ public class SwingProGroup extends DefaultActionGroup {
         String chooseDirPath = root.getPath();
         NEW_SWING_FILE_ACTION.setPath(chooseDirPath);
         NEW_SWING_FILE_ACTION.setChooseFile(root);
+        NEW_ACTIVITY_FILE_ACTION.setPath(chooseDirPath);
+        NEW_ACTIVITY_FILE_ACTION.setChooseFile(root);
     }
 
 }
